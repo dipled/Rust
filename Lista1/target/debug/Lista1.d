@@ -1,1 +1,1 @@
-/home/hln/Desktop/Code/Rust/Lista1/target/debug/Lista1: /home/hln/Desktop/Code/Rust/Lista1/src/main.rs
+/home/hln/Desktop/Code/Rust/Lista1/target/debug/Lista1: /home/hln/Desktop/Code/Rust/Lista1/src/ex01.rs /home/hln/Desktop/Code/Rust/Lista1/src/ex02.rs /home/hln/Desktop/Code/Rust/Lista1/src/ex03.rs /home/hln/Desktop/Code/Rust/Lista1/src/ex04.rs /home/hln/Desktop/Code/Rust/Lista1/src/main.rs
