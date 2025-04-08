@@ -1,4 +1,4 @@
-pub fn highest(v: &Vec<i32>) -> Option<i32>{
+pub fn highest(v: &[i32]) -> Option<i32>{
 
     if v.is_empty() {
         return None
