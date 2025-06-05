@@ -131,9 +131,6 @@ impl<T: Display + Ord> Display for Tree<T> {
     }
 }
 
-// ----------------------------
-// Iterador in-order
-// ----------------------------
 pub struct TreeIter<'a, T> {
     stack: Vec<&'a Node<T>>,
 }
