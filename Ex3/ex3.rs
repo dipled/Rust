@@ -11,7 +11,6 @@ pub struct Tree<T> {
 }
 
 impl<T: Ord> Tree<T> {
-    
     pub fn new() -> Self {
         Tree { root: None }
     }
@@ -103,6 +102,16 @@ impl<T: Ord> Tree<T> {
         inorder_recursive(&self.root, &mut vec);
         vec
     }
+
+    pub fn iter(&self) -> TreeIter<T> {
+        let mut stack = Vec::new();
+        let mut current = &self.root;
+        while let Some(ref node) = current {
+            stack.push(&**node);
+            current = &node.left;
+        }
+        TreeIter { stack }
+    }
 }
 
 impl<T: Display + Ord> Display for Tree<T> {
@@ -122,6 +131,68 @@ impl<T: Display + Ord> Display for Tree<T> {
     }
 }
 
-fn main() {
-   
+// ----------------------------
+// Iterador in-order
+// ----------------------------
+pub struct TreeIter<'a, T> {
+    stack: Vec<&'a Node<T>>,
+}
+
+impl<'a, T> Iterator for TreeIter<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut node = self.stack.pop()?;
+
+        let mut current = &node.right;
+        while let Some(ref inner) = current {
+            self.stack.push(&**inner);
+            current = &inner.left;
+        }
+
+        Some(&node.element)
+    }
+}
+
+// ----------------------------
+// Módulo de testes
+// ----------------------------
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_insertion_and_inorder() {
+        let mut tree = Tree::new();
+        tree.insert(5);
+        tree.insert(3);
+        tree.insert(7);
+        tree.insert(1);
+        let result = tree.inorder().iter().map(|x| **x).collect::<Vec<_>>();
+        assert_eq!(result, vec![1, 3, 5, 7]);
+    }
+
+    #[test]
+    fn test_iterator() {
+        let mut tree = Tree::new();
+        tree.insert(10);
+        tree.insert(5);
+        tree.insert(15);
+        let result = tree.iter().map(|x| *x).collect::<Vec<_>>();
+        assert_eq!(result, vec![5, 10, 15]);
+    }
+
+    #[test]
+    fn test_remove_and_inorder() {
+        let mut tree = Tree::new();
+        tree.insert(8);
+        tree.insert(3);
+        tree.insert(10);
+        tree.insert(1);
+        tree.insert(6);
+        tree.insert(14);
+        tree.remove(&10);
+        let result = tree.inorder().iter().map(|x| **x).collect::<Vec<_>>();
+        assert_eq!(result, vec![1, 3, 6, 8, 14]);
+    }
 }
