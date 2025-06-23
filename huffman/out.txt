@@ -1,226 +1,178 @@
-{-# LANGUAGE GADTSyntax #-}
+Methamphetamine[note 1] (contracted from N-methylamphetamine) is a potent central nervous system (CNS) stimulant that is mainly used as a recreational or performance-enhancing drug and less commonly as a second-line treatment for attention deficit hyperactivity disorder (ADHD).[25] It has also been researched as a potential treatment for traumatic brain injury.[8] Methamphetamine was discovered in 1893 and exists as two enantiomers: levo-methamphetamine and dextro-methamphetamine.[note 2] Methamphetamine properly refers to a specific chemical substance, the racemic free base, which is an equal mixture of levomethamphetamine and dextromethamphetamine in their pure amine forms, but the hydrochloride salt, commonly called crystal meth, is widely used. Methamphetamine is rarely prescribed over concerns involving its potential for recreational use as an aphrodisiac and euphoriant, among other concerns, as well as the availability of safer substitute drugs with comparable treatment efficacy such as Adderall and Vyvanse.[25] While pharmaceutical formulations of methamphetamine in the United States are labeled as methamphetamine hydrochloride, they contain dextromethamphetamine as the active ingredient.[25][note 3] Dextromethamphetamine is a stronger CNS stimulant than levomethamphetamine.[25]
 
-import Data.Binary.Get qualified as G
-import Data.Binary.Put qualified as P
-import Data.Bits
-import Data.ByteString.Internal qualified as I
-import Data.ByteString.Lazy qualified as L
-import Data.List
-import Data.Word
+Both racemic methamphetamine and dextromethamphetamine are illicitly trafficked and sold owing to their potential for recreational use. The highest prevalence of illegal methamphetamine use occurs in parts of Asia and Oceania, and in the United States, where racemic methamphetamine and dextromethamphetamine are classified as Schedule II controlled substances. Levomethamphetamine is available as an over-the-counter (OTC) drug for use as an inhaled nasal decongestant in the United States.[note 4] Internationally, the production, distribution, sale, and possession of methamphetamine is restricted or banned in many countries, owing to its placement in schedule II of the United Nations Convention on Psychotropic Substances treaty. While dextromethamphetamine is a more potent drug, racemic methamphetamine is illicitly produced more often, owing to the relative ease of synthesis and regulatory limits of chemical precursor availability.
 
-type Reg = (Word8, Word32)
+In low to moderate doses, methamphetamine can elevate mood, increase alertness, concentration and energy in fatigued individuals, reduce appetite, and promote weight loss. At very high doses, it can induce psychosis, breakdown of skeletal muscle, seizures, and bleeding in the brain. Chronic high-dose use can precipitate unpredictable and rapid mood swings, stimulant psychosis (e.g., paranoia, hallucinations, delirium, and delusions), and violent behavior. Recreationally, methamphetamine's ability to increase energy has been reported to lift mood and increase sexual desire to such an extent that users are able to engage in sexual activity continuously for several days while binging the drug.[30] Methamphetamine is known to possess a high addiction liability (i.e., a high likelihood that long-term or high dose use will lead to compulsive drug use) and high dependence liability (i.e., a high likelihood that withdrawal symptoms will occur when methamphetamine use ceases). Discontinuing methamphetamine after heavy use may lead to a post-acute-withdrawal syndrome, which can persist for months beyond the typical withdrawal period. At high doses, methamphetamine is neurotoxic to human midbrain dopaminergic neurons and, to a lesser extent, serotonergic neurons.[31][32] Methamphetamine neurotoxicity causes adverse changes in brain structure and function, such as reductions in grey matter volume in several brain regions, as well as adverse changes in markers of metabolic integrity.[32]
 
-data Huffman where
-  Folha :: Int -> Char -> Huffman
-  No :: Int -> Huffman -> Huffman -> Huffman
-  deriving (Show)
+Methamphetamine belongs to the substituted phenethylamine and substituted amphetamine chemical classes. It is related to the other dimethylphenethylamines as a positional isomer of these compounds, which share the common chemical formula C10H15N.
 
-instance Eq Huffman where
-  (==) :: Huffman -> Huffman -> Bool
-  a == b = pegaNumero a == pegaNumero b
+Uses
 
-instance Ord Huffman where
-  (<=) :: Huffman -> Huffman -> Bool
-  a <= b = pegaNumero a <= pegaNumero b
+Medical
 
-ordena :: (Ord a) => [a] -> [a]
-ordena [] = []
-ordena [x] = [x]
-ordena l@(x : xs) = ordena (filter (< x) xs) ++ filter (== x) l ++ ordena (filter (> x) xs)
+Desoxyn (methamphetamine hydrochloride) 100 tablets
 
+In the United States, methamphetamine hydrochloride, sold under the brand name Desoxyn, is FDA-approved for the treatment of attention deficit hyperactivity disorder (ADHD);[27][33] however, the FDA notes that the limited therapeutic usefulness of methamphetamine should be weighed against the risks associated with its use.[27] To avoid toxicity and risk of side effects, FDA guidelines recommend an initial dose of methamphetamine at doses 5-10 mg/day for ADHD in adults and children over six years of age, and may be increased at weekly intervals of 5 mg, up to 25 mg/day, until optimum clinical response is found; the usual effective dose is around 20-25 mg/day.[25][8][27] Methamphetamine is sometimes prescribed off-label for obesity, narcolepsy, and idiopathic hypersomnia.[25][34][35] In the United States, methamphetamine's levorotary form is available in some over-the-counter (OTC) nasal decongestant products.[25][note 4]
 
-count :: (Eq a) => a -> [a] -> Int
-count x = length . filter (x ==)
+Although the pharmaceutical name "methamphetamine hydrochloride" may suggest a racemic mixture, Desoxyn contains enantiopure dextromethamphetamine, which is a more potent stimulant than both levomethamphetamine and racemic methamphetamine.[25][note 3] This naming convention deviates from the standard practice observed with other stimulants, such as Adderall and dextroamphetamine, where the dextrorotary enantiomer is explicitly identified as an active ingredient in both generic and brand-name pharmaceuticals.[36][37][38]
 
-freqSimb :: String -> [Huffman]
-freqSimb s = ordena $ go s
-  where
-    go [] = []
-    go s@(x : xs) = Folha (count x s) x : go (filter (x /=) xs)
+As methamphetamine is associated with a high potential for misuse, the drug is regulated under the Controlled Substances Act and is listed under Schedule II in the United States.[4] Methamphetamine hydrochloride dispensed in the United States is required to include a boxed warning regarding its potential for recreational misuse and addiction liability.[27]
 
-pegaNumero :: Huffman -> Int
-pegaNumero (Folha i c) = i
-pegaNumero (No i l r) = i
+Desoxyn and Desoxyn Gradumet are both pharmaceutical forms of the drug. The latter is no longer produced and is an extended-release form of the drug, flattening the curve of the effect of the drug while extending it.[39] 
 
-construirArvore :: [Huffman] -> Huffman
-construirArvore [] = error "Arvore Vazia"
-construirArvore [x] = x
-construirArvore (x : y : xs) = construirArvore $ insere (No (pegaNumero x + pegaNumero y) x y) xs
-  where
-    insere a [] = [a]
-    insere a l@(x : xs)
-      | a <= x = a : l
-      | otherwise = x : insere a xs
+Recreational
 
-codHuffman :: Huffman -> [(Char, String)]
-codHuffman = go ""
-  where
-    go s (No i l r) = go (s ++ "0") l ++ go (s ++ "1") r
-    go s (Folha i c) = [(c, s)]
+Methamphetamine is often used recreationally for its effects as a potent euphoriant and stimulant as well as aphrodisiac qualities.[40]
 
-codificar :: String -> Huffman -> String
-codificar "" _ = ""
-codificar s@(x : xs) h = concat $ go s $ codHuffman h
-  where
-    go [] _ = []
-    go s@(x : xs) huffmanCode = map snd (filter ((x ==) . fst) huffmanCode) ++ go xs huffmanCode
+According to a National Geographic TV documentary on methamphetamine, an entire subculture known as party and play is based around sexual activity and methamphetamine use.[40] Participants in this subculture, which consists almost entirely of homosexual male methamphetamine users, will typically meet up through internet dating sites and have sex.[40] Because of its strong stimulant and aphrodisiac effects and inhibitory effect on ejaculation, with repeated use, these sexual encounters will sometimes occur continuously for several days on end.[40] The crash following the use of methamphetamine in this manner is very often severe, with marked hypersomnia (excessive daytime sleepiness).[40] The party and play subculture is prevalent in major US cities such as San Francisco and New York City.[40][41] 
 
-decodificar :: String -> Huffman -> String
-decodificar [] _ = []
-decodificar s@(x : xs) h@(No i l r) =  let (caractere, resto) = go s (No i l r) in caractere : decodificar resto h
-  where 
-    go s (Folha i c) = (c, s)
-    go s@(x : xs) h@(No i l r)
-      | x == '0' = go xs l
-      | x == '1' = go xs r
+Methamphetamine is contraindicated in individuals with a history of substance use disorder, heart disease, or severe agitation or anxiety, or in individuals currently experiencing arteriosclerosis, glaucoma, hyperthyroidism, or severe hypertension.[27] The FDA states that individuals who have experienced hypersensitivity reactions to other stimulants in the past or are currently taking monoamine oxidase inhibitors should not take methamphetamine.[27] The FDA also advises individuals with bipolar disorder, depression, elevated blood pressure, liver or kidney problems, mania, psychosis, Raynaud's phenomenon, seizures, thyroid problems, tics, or Tourette syndrome to monitor their symptoms while taking methamphetamine.[27] Owing to the potential for stunted growth, the FDA advises monitoring the height and weight of growing children and adolescents during treatment.[27]
 
-freq :: (Eq a) => [a] -> [(a, Int)]
-freq [] = []
-freq (x : xs) = let (l1, l2) = partition (== x) xs in (x, length l1 + 1) : freq l2
+Adverse effects
 
-putStart :: (Int, Int) -> P.Put
-putStart (n, t) =
-  do
-    P.putWord8 $ toEnum n
-    P.putWord32be $ toEnum t
-    P.flush
+A 2010 study ranking various illegal and legal drugs based on statements by drug-harm experts. Methamphetamine was found to be the fourth most damaging to users.[42]
 
-putFreqList :: [(Char, Int)] -> P.Put
-putFreqList [] = P.flush
-putFreqList ((c, f) : xs) =
-  do
-    P.putWord8 $ I.c2w c
-    P.putWord32be $ toEnum f
-    putFreqList xs
+A 2010 study ranking various illegal and legal drugs based on statements by drug-harm experts. Methamphetamine was found to be the fourth most damaging to users.[42]
+Main short and long term adverse physical and mental effects that may appear in methamphetamine use
 
-s2w :: String -> Word8
-s2w string = go string 7 where
-    go []     _ = 0
-    go (x:xs) n = shift (read [x]) n + go xs (n - 1)
+Physical
 
-w2s :: Word8 -> String
-w2s word = go word 128 where
-    go :: Word8 -> Word8 -> String
-    go _ 0 = []
-    go w n | w .&. n == 0 = '0' : go w (shift n $ -1)
-           | otherwise    = '1' : go w (shift n $ -1)
+Cardiovascular
 
-putFullTxt :: String -> P.Put
-putFullTxt [] = P.flush
-putFullTxt s =
-  do
-    P.putWord8 $ s2w $ take 8 s
-    putFullTxt $ drop 8 s
+Methamphetamine is a sympathomimetic drug that causes vasoconstriction and tachycardia. Methamphetamine also promotes abnormal extra heart beats and irregular heart rhythms some of which may be life-threatening. [43]
 
-getReg :: G.Get Reg
-getReg =
-  do
-    c <- G.getWord8
-    f <- G.getWord32be
-    return (c, f)
+Other physical effects
 
-getRegs :: G.Get [Reg] -- argumento da funcao propagado pelo pipeline da monada
-getRegs =
-  do
-    empty <- G.isEmpty
-    if empty
-      then return []
-      else do r <- getReg; rs <- getRegs; return (r : rs)
+The effects can also include loss of appetite, hyperactivity, dilated pupils, flushed skin, excessive sweating, increased movement, dry mouth and teeth grinding (potentially leading to condition informally known as meth mouth), headache, rapid breathing, high body temperature, diarrhea, constipation, blurred vision, dizziness, twitching, numbness, tremors, dry skin, acne, and pale appearance.[27][44] Long-term meth users may have sores on their skin;[45][46] these may be caused by scratching due to itchiness or the belief that insects are crawling under their skin,[45] and the damage is compounded by poor diet and hygiene.[46] Numerous deaths related to methamphetamine overdoses have been reported.[47][48] Additionally, "[p]ostmortem examinations of human tissues have linked use of the drug to diseases associated with aging, such as coronary atherosclerosis and pulmonary fibrosis",[49] which may be caused "by a considerable rise in the formation of ceramides, pro-inflammatory molecules that can foster cell aging and death."[49]
 
-printRegs :: [Reg] -> IO ()
-printRegs [] = return ()
-printRegs ((c, f) : rs) =
-  do
-    putStrLn $ (show $ I.w2c c) ++ " - " ++ show f
-    printRegs rs
+Dental and oral health ("meth mouth")
 
-printStart :: Reg -> IO ()
-printStart (n, t) =
-  do
-    putStrLn $ show n ++ " - " ++ show t
+A suspected case of meth mouth
 
-getC :: G.Get Word8
-getC = G.getWord8 >>= \x -> return x
+Methamphetamine users, particularly heavy users, may lose their teeth abnormally quickly, regardless of the route of administration, from a condition informally known as meth mouth.[50] The condition is generally most severe in users who inject the drug, rather than swallow, smoke, or inhale it.[50] According to the American Dental Association, meth mouth "is probably caused by a combination of drug-induced psychological and physiological changes resulting in xerostomia (dry mouth), extended periods of poor oral hygiene, frequent consumption of high-calorie, carbonated beverages and bruxism (teeth grinding and clenching)".[50][51] As dry mouth is also a common side effect of other stimulants, which are not known to contribute severe tooth decay, many researchers suggest that methamphetamine-associated tooth decay is more due to users' other choices. They suggest the side effect has been exaggerated and stylized to create a stereotype of current users as a deterrence for new ones.[33]
 
-getMsg :: G.Get [Word8] -- argumento da funcao propagado pelo pipeline da monada
-getMsg =
-  do
-    empty <- G.isEmpty
-    if empty
-      then return []
-      else do x <- getC; xs <- getMsg; return (x : xs)
+Sexually transmitted infection
 
-printMsg :: [Word8] -> IO ()
-printMsg [] = return ()
-printMsg (x : xs) = (putStrLn $ show x) >> printMsg xs
+Methamphetamine use was found to be related to higher frequencies of unprotected sexual intercourse in both HIV-positive and unknown casual partners, an association more pronounced in HIV-positive participants.[52] These findings suggest that methamphetamine use and engagement in unprotected anal intercourse are co-occurring risk behaviors, behaviors that potentially heighten the risk of HIV transmission among gay and bisexual men.[52] Methamphetamine use allows users of both sexes to engage in prolonged sexual activity, which may cause genital sores and abrasions as well as priapism in men.[27][53] Methamphetamine may also cause sores and abrasions in the mouth via bruxism, increasing the risk of sexually transmitted infection.[27][53]
+
+Besides the sexual transmission of HIV, it may also be transmitted between users who share a common needle.[54] The level of needle sharing among methamphetamine users is similar to that among other drug injection users.[54]
+
+Psychological
+
+The psychological effects of methamphetamine can include euphoria, dysphoria, changes in libido, alertness, apprehension and concentration, decreased sense of fatigue, insomnia or wakefulness, self-confidence, sociability, irritability, restlessness, grandiosity and repetitive and obsessive behaviors.[27][44][55] Peculiar to methamphetamine and related stimulants is "punding", persistent non-goal-directed repetitive activity.[56] Methamphetamine use also has a high association with anxiety, depression, amphetamine psychosis, suicide, and violent behaviors.[57][58]
+
+Neurotoxicity
+
+This diagram depicts the neuroimmune mechanisms that mediate methamphetamine-induced neurodegeneration in the human brain.[59] The NF--mediated neuroimmune response to methamphetamine use which results in the increased permeability of the blood-brain barrier arises through its binding at and activation of sigma receptors, the increased production of reactive oxygen species (ROS), reactive nitrogen species (RNS), and damage-associated molecular pattern molecules (DAMPs), the dysregulation of glutamate transporters (specifically, EAAT1 and EAAT2) and glucose metabolism, and excessive Ca2+ ion influx in glial cells and dopamine neurons.[59][60][61]
+
+Methamphetamine is directly neurotoxic to dopaminergic neurons in both lab animals and humans.[31][32] Excitotoxicity, oxidative stress, metabolic compromise, UPS dysfunction, protein nitration, endoplasmic reticulum stress, p53 expression and other processes contributed to this neurotoxicity.[31][62][5] In line with its dopaminergic neurotoxicity, methamphetamine use is associated with a higher risk of Parkinson's disease.[63] In addition to its dopaminergic neurotoxicity, a review of evidence in humans indicated that high-dose methamphetamine use can also be neurotoxic to serotonergic neurons.[32] It has been demonstrated that a high core temperature is correlated with an increase in the neurotoxic effects of methamphetamine.[64] Withdrawal of methamphetamine in dependent persons may lead to post-acute withdrawal which persists months beyond the typical withdrawal period.[5]
+
+Magnetic resonance imaging studies on human methamphetamine users have also found evidence of neurodegeneration, or adverse neuroplastic changes in brain structure and function.[32] In particular, methamphetamine appears to cause hyperintensity and hypertrophy of white matter, marked shrinkage of hippocampi, and reduced gray matter in the cingulate cortex, limbic cortex, and paralimbic cortex in recreational methamphetamine users.[32] Moreover, evidence suggests that adverse changes in the level of biomarkers of metabolic integrity and synthesis occur in recreational users, such as a reduction in N-acetylaspartate and creatine levels and elevated levels of choline and myoinositol.[32]
+
+Methamphetamine has been shown to activate TAAR1 in human astrocytes and generate cAMP as a result.[63] Activation of astrocyte-localized TAAR1 appears to function as a mechanism by which methamphetamine attenuates membrane-bound EAAT2 (SLC1A2) levels and function in these cells.[63]
+
+Methamphetamine binds to and activates both sigma receptor subtypes, sigma1 and sigma2, with micromolar affinity.[61][65] Sigma receptor activation may promote methamphetamine-induced neurotoxicity by facilitating hyperthermia, increasing dopamine synthesis and release, influencing microglial activation, and modulating apoptotic signaling cascades and the formation of reactive oxygen species.[61][65]
+
+Addiction
+
+Addiction and dependence glossary[66][67][68]
+
+    addiction - a biopsychosocial disorder characterized by persistent use of drugs (including alcohol) despite substantial harm and adverse consequences
+    addictive drug - psychoactive substances that with repeated use are associated with significantly higher rates of substance use disorders, due in large part to the drug's effect on brain reward systems
+    dependence - an adaptive state associated with a withdrawal syndrome upon cessation of repeated exposure to a stimulus (e.g., drug intake)
+    drug sensitization or reverse tolerance - the escalating effect of a drug resulting from repeated administration at a given dose
+    drug withdrawal - symptoms that occur upon cessation of repeated drug use
+    physical dependence - dependence that involves persistent physical-somatic withdrawal symptoms (e.g., delirium tremens and nausea)
+    psychological dependence - dependence that is characterised by emotional-motivational withdrawal symptoms (e.g., anhedonia and anxiety) that affect cognitive functioning.
+    reinforcing stimuli - stimuli that increase the probability of repeating behaviors paired with them
+    rewarding stimuli - stimuli that the brain interprets as intrinsically positive and desirable or as something to approach
+    sensitization - an amplified response to a stimulus resulting from repeated exposure to it
+    substance use disorder - a condition in which the use of substances leads to clinically and functionally significant impairment or distress
+    tolerance - the diminishing effect of a drug resulting from repeated administration at a given dose
+
+    v
+    t
+    e
+
+The signaling cascade involved in psychostimulant addiction
+
+Note: colored text contains article links.
+
+The image above contains clickable links
+
+This diagram depicts the signaling events in the brain's reward center that are induced by chronic high-dose exposure to psychostimulants that increase the concentration of synaptic dopamine, like amphetamine, methamphetamine, and phenethylamine. Following presynaptic dopamine and glutamate co-release by such psychostimulants,[69][70] postsynaptic receptors for these neurotransmitters trigger internal signaling events through a cAMP-dependent pathway and a calcium-dependent pathway that ultimately result in increased CREB phosphorylation.[69][71][72] Phosphorylated CREB increases levels of FosB, which in turn represses the c-Fos gene with the help of corepressors;[69][73][74] c-Fos repression acts as a molecular switch that enables the accumulation of FosB in the neuron.[75] A highly stable (phosphorylated) form of FosB, one that persists in neurons for 1-2 months, slowly accumulates following repeated high-dose exposure to stimulants through this process.[73][74] FosB functions as "one of the master control proteins" that produces addiction-related structural changes in the brain, and upon sufficient accumulation, with the help of its downstream targets (e.g., nuclear factor kappa B), it induces an addictive state.[73][74]
 
 
-reg2LeafList :: [Reg] -> [Huffman]
-reg2LeafList r = ordena $ go r
-  where
-    go [] = []
-    go ((c, f) : rs) = (Folha (read $ show f) $ I.w2c c) : go rs
+Current models of addiction from chronic drug use involve alterations in gene expression in certain parts of the brain, particularly the nucleus accumbens.[76][77] The most important transcription factors[note 5] that produce these alterations are FosB, cAMP response element binding protein (CREB), and nuclear factor kappa B (NF).[77] FosB plays a crucial role in the development of drug addictions, since its overexpression in D1-type medium spiny neurons in the nucleus accumbens is necessary and sufficient[note 6] for most of the behavioral and neural adaptations that arise from addiction.[67][77][79] Once FosB is sufficiently overexpressed, it induces an addictive state that becomes increasingly more severe with further increases in FosB expression.[67][79] It has been implicated in addictions to alcohol, cannabinoids, cocaine, methylphenidate, nicotine, opioids, phencyclidine, propofol, and substituted amphetamines, among others.[77][79][80][81][82]
 
-escrita :: IO ()
-escrita =
-  do
-    txt <- readFile "file.txt"
-    let xs = freq txt
-    let fr = freqSimb txt
-    let tr = construirArvore fr
-    let hf = codHuffman tr
-    let final = codificar txt tr
-    let uniqueCharacters = length xs
-    let totalCharacters = 8 - rem (length final) 8
-    let bs1 = P.runPut $ putStart (uniqueCharacters, totalCharacters)
-    let bs = P.runPut $ putFreqList xs
-    let bs2 = P.runPut $ putFullTxt final
-    L.writeFile "file.bin" $ bs1 <> bs <> bs2
+JunD, a transcription factor, and G9a, a histone methyltransferase enzyme, both directly oppose the induction of FosB in the nucleus accumbens (i.e., they oppose increases in its expression).[67][77][83] Sufficiently overexpressing JunD in the nucleus accumbens with viral vectors can completely block many of the neural and behavioral alterations seen in chronic drug use (i.e., the alterations mediated by FosB).[77] FosB also plays an important role in regulating behavioral responses to natural rewards, such as palatable food, sex, and exercise.[77][80][84] Since both natural rewards and addictive drugs induce expression of FosB (i.e., they cause the brain to produce more of it), chronic acquisition of these rewards can result in a similar pathological state of addiction.[77][80] FosB is the most significant factor involved in both amphetamine addiction and amphetamine-induced sex addictions, which are compulsive sexual behaviors that result from excessive sexual activity and amphetamine use.[note 7][80][85] These sex addictions (i.e., drug-induced compulsive sexual behaviors) are associated with a dopamine dysregulation syndrome which occurs in some patients taking dopaminergic drugs, such as amphetamine or methamphetamine.[80][84][85]
 
-leitura :: IO ()
-leitura =
-  do
-    bs <- L.readFile "file.bin"
-    let regHead@(n, t) = G.runGet getReg bs
-    let regTail = G.runGet getRegs $ L.take ((read $ show n) * 5) $ L.drop 5 bs
-    let msg = G.runGet getMsg $ L.drop ((read $ show n) * 5 + 5) bs
-    printStart regHead
-    printRegs regTail
-    let fr = reg2LeafList regTail
-    let binMsg' = concat $ map w2s msg
-    let binMsg = take (length binMsg' - fromEnum t) binMsg'
-    let msgDecodificada = decodificar binMsg $ construirArvore fr
-    -- print t
-    -- print $ length binMsg' - fromEnum t
-    writeFile "out.txt" msgDecodificada
+Epigenetic factors
 
-passoAPasso :: IO () =
-  do
-    putStrLn "Digite uma String"
-    ln <- getLine
-    let fr = freqSimb ln
-    print fr
-    putStrLn ""
-    let tr = construirArvore fr
-    print tr
-    putStrLn ""
-    let hf = codHuffman tr
-    print hf
-    putStrLn ""
-    let final = codificar ln tr
-    print $ "codificado: " ++ final
-    print $ getBytes final
-    putStrLn ""
-    putStrLn ""
-    print $ "decodificado: " ++ decodificar final tr
+Methamphetamine addiction is persistent for many individuals, with 61% of individuals treated for addiction relapsing within one year.[86] About half of those with methamphetamine addiction continue with use over a ten-year period, while the other half reduce use starting at about one to four years after initial use.[87]
 
-getBytes :: String -> [Word8]
-getBytes "" = []
-getBytes s = (s2w $ take 8 s) : (getBytes $ drop 8 s)
+The frequent persistence of addiction suggests that long-lasting changes in gene expression may occur in particular regions of the brain, and may contribute importantly to the addiction phenotype. In 2014, a crucial role was found for epigenetic mechanisms in driving lasting changes in gene expression in the brain.[83]
 
+A review in 2015[88] summarized a number of studies involving chronic methamphetamine use in rodents. Epigenetic alterations were observed in the brain reward pathways, including areas like ventral tegmental area, nucleus accumbens, and dorsal striatum, the hippocampus, and the prefrontal cortex. Chronic methamphetamine use caused gene-specific histone acetylations, deacetylations and methylations. Gene-specific DNA methylations in particular regions of the brain were also observed. The various epigenetic alterations caused downregulations or upregulations of specific genes important in addiction. For instance, chronic methamphetamine use caused methylation of the lysine in position 4 of histone 3 located at the promoters of the c-fos and the C-C chemokine receptor 2 (ccr2) genes, activating those genes in the nucleus accumbens (NAc).[88] c-fos is well known to be important in addiction.[89] The ccr2 gene is also important in addiction, since mutational inactivation of this gene impairs addiction.[88]
 
-main :: IO ()
-main = 
-  do
-    escrita
-    leitura
+In methamphetamine addicted rats, epigenetic regulation through reduced acetylation of histones, in brain striatal neurons, caused reduced transcription of glutamate receptors.[90] Glutamate receptors play an important role in regulating the reinforcing effects of addictive drugs.[91]
+
+Administration of methamphetamine to rodents causes DNA damage in their brain, particularly in the nucleus accumbens region.[92][93] During repair of such DNA damages, persistent chromatin alterations may occur such as in the methylation of DNA or the acetylation or methylation of histones at the sites of repair.[94] These alterations can be epigenetic scars in the chromatin that contribute to the persistent epigenetic changes found in methamphetamine addiction.
+
+Treatment and management
+
+A 2018 systematic review and network meta-analysis of 50 trials involving 12 different psychosocial interventions for amphetamine, methamphetamine, or cocaine addiction found that combination therapy with both contingency management and community reinforcement approach had the highest efficacy (i.e., abstinence rate) and acceptability (i.e., lowest dropout rate). Other treatment modalities examined in the analysis included monotherapy with contingency management or community reinforcement approach, cognitive behavioral therapy, 12-step programs, non-contingent reward-based therapies, psychodynamic therapy, and other combination therapies involving these.
+
+As of December 2019, there is no effective pharmacotherapy for methamphetamine addiction.[96][97][98] A systematic review and meta-analysis from 2019 assessed the efficacy of 17 different pharmacotherapies used in randomized controlled trials (RCTs) for amphetamine and methamphetamine addiction;[97] it found only low-strength evidence that methylphenidate might reduce amphetamine or methamphetamine self-administration.[97] There was low- to moderate-strength evidence of no benefit for most of the other medications used in RCTs, which included antidepressants (bupropion, mirtazapine, sertraline), antipsychotics (aripiprazole), anticonvulsants (topiramate, baclofen, gabapentin), naltrexone, varenicline, citicoline, ondansetron, prometa, riluzole, atomoxetine, dextroamphetamine, and modafinil.[97][99]
+
+Medication-Assisted Treatment (MAT) combines FDA-approved medications with behavioral therapies to address substance use disorders. This approach aims to reduce cravings and withdrawal symptoms, supporting individuals in their recovery process.[100]
+
+Dependence and withdrawal
+
+Tolerance is expected to develop with regular methamphetamine use and, when used recreationally, this tolerance develops rapidly.[101][102] In dependent users, withdrawal symptoms are positively correlated with the level of drug tolerance.[103] Depression from methamphetamine withdrawal lasts longer and is more severe than that of cocaine withdrawal.[104]
+
+According to the current Cochrane review on drug dependence and withdrawal in recreational users of methamphetamine, "when chronic heavy users abruptly discontinue [methamphetamine] use, many report a time-limited withdrawal syndrome that occurs within 24 hours of their last dose".[103] Withdrawal symptoms in chronic, high-dose users are frequent, occurring in up to 87.6% of cases, and persist for three to four weeks with a marked "crash" phase occurring during the first week.[103] Methamphetamine withdrawal symptoms can include anxiety, drug craving, dysphoric mood, fatigue, increased appetite, increased movement or decreased movement, lack of motivation, sleeplessness or sleepiness, and vivid or lucid dreams.[103]
+
+Methamphetamine that is present in a mother's bloodstream can pass through the placenta to a fetus and be secreted into breast milk.[104] Infants born to methamphetamine-abusing mothers may experience a neonatal withdrawal syndrome, with symptoms involving of abnormal sleep patterns, poor feeding, tremors, and hypertonia.[104] This withdrawal syndrome is relatively mild and only requires medical intervention in approximately 4% of cases.[104]
+Summary of addiction-related plasticity Form of neuroplasticity
+or behavioral plasticity 	Type of reinforcer 	Sources
+Opiates 	Psychostimulants 	High fat or sugar food 	Sexual intercourse 	Physical exercise
+(aerobic) 	Environmental
+enrichment
+FosB expression in
+nucleus accumbens D1-type MSNsTooltip medium spiny neurons 	 	 	 	 	 	 	[80]
+Behavioral plasticity
+Escalation of intake 	Yes 	Yes 	Yes 				[80]
+Psychostimulant
+cross-sensitization 	Yes 	Not applicable 	Yes 	Yes 	Attenuated 	Attenuated 	[80]
+Psychostimulant
+self-administration 	 	 	 		 	 	[80]
+Psychostimulant
+conditioned place preference 	 	 	 	 	 	 	[80]
+Reinstatement of drug-seeking behavior 	 	 			 	 	[80]
+Neurochemical plasticity
+CREBTooltip cAMP response element-binding protein phosphorylation
+in the nucleus accumbens 	 	 	 		 	 	[80]
+Sensitized dopamine response
+in the nucleus accumbens 	No 	Yes 	No 	Yes 			[80]
+Altered striatal dopamine signaling 	DRD2, DRD3 	DRD1, DRD2, DRD3 	DRD1, DRD2, DRD3 		DRD2 	DRD2 	[80]
+Altered striatal opioid signaling 	No change or
+opioid receptors 	opioid receptors
+opioid receptors 	opioid receptors 	opioid receptors 	No change 	No change 	[80]
+Changes in striatal opioid peptides 	dynorphin
+No change: enkephalin 	dynorphin 	enkephalin 		dynorphin 	dynorphin 	[80]
+Mesocorticolimbic synaptic plasticity
+Number of dendrites in the nucleus accumbens 	 	 		 			[80]
+Dendritic spine density in
+the nucleus accumbens 	 	 		 			[80]
+
+Neonatal
+
+Unlike other drugs, babies with prenatal exposure to methamphetamine do not show immediate signs of withdrawal. Instead, cognitive and behavioral problems start emerging when the children reach school age.[105]
+
+A prospective cohort study of 330 children showed that at the age of 3, children with methamphetamine exposure showed increased emotional reactivity, as well as more signs of anxiety and depression; and at the age of 5, children showed higher rates of externalizing disorders and attention deficit hyperactivity disorder (ADHD).[106]
+
+Overdose
+
+Methamphetamine overdose is a diverse term. It frequently refers to the exaggeration of the unusual effects with features such as irritability, agitation, hallucinations and paranoia.[6][27] The cardiovascular effects are typically not noticed in young healthy people. Hypertension and tachycardia are not apparent unless measured. A moderate overdose of methamphetamine may induce symptoms such as: abnormal heart rhythm, confusion, difficult or painful urination, high or low blood pressure, high body temperature, over-active or over-responsive reflexes, muscle aches, severe agitation, rapid breathing, tremor, urinary hesitancy, and an inability to pass urine.[6][44] An extremely large overdose may produce symptoms such as adrenergic storm, methamphetamine psychosis, substantially reduced or no urine output, cardiogenic shock, bleeding in the brain, circulatory collapse, hyperpy rexia (i.e., dangerously high body temperature), pulmonary hypertension, kidney failure, rapid muscle breakdown, serotonin syndrome, and a form of stereotypy ("tweaking").[sources 1] A methamphetamine overdose will likely also result in mild brain damage owing to dopaminergic and serotonergic neurotoxicity.[110][32] Death from methamphetamine poisoning is typically preceded by convulsions and coma.[27]
+
