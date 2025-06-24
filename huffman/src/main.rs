@@ -179,9 +179,16 @@ fn compress(input_path: &str, output_path: &str) {
     writer.write_all(&t.to_be_bytes()).unwrap();
 
     for (c, f) in &freq_table {
-        writer.write_all(&(*c as u8).to_be_bytes()).unwrap();
-        writer.write_all(&f.to_be_bytes()).unwrap();
+        let c_string = c.to_string();            // armazena a string no stack
+        let c_bytes = c_string.as_bytes();        // pega o slice da string viva
+        let len = c_bytes.len() as u8;
+    
+        writer.write_all(&[len]).unwrap();           // escreve o tamanho
+        writer.write_all(c_bytes).unwrap();          // escreve os bytes do caractere
+        writer.write_all(&f.to_be_bytes()).unwrap(); // escreve a frequência
     }
+    
+    
 
     writer.write_all(&encoded_bytes).unwrap();
 }
@@ -198,14 +205,21 @@ fn decompress(input_path: &str, output_path: &str) {
 
     let mut freq_table = HashMap::new();
     for _ in 0..n {
-        let mut c = [0u8; 1];
+        let mut len_buf = [0u8; 1];
+        reader.read_exact(&mut len_buf).unwrap();
+        let len = len_buf[0] as usize;
+    
+        let mut c_buf = vec![0u8; len];
+        reader.read_exact(&mut c_buf).unwrap();
+        let c = std::str::from_utf8(&c_buf).unwrap().chars().next().unwrap();
+    
         let mut f = [0u8; 4];
-        reader.read_exact(&mut c).unwrap();
         reader.read_exact(&mut f).unwrap();
-        let c = c[0] as char;
         let f = u32::from_be_bytes(f);
+    
         freq_table.insert(c, f);
     }
+    
 
     let mut encoded_bytes = Vec::new();
     reader.read_to_end(&mut encoded_bytes).unwrap();
