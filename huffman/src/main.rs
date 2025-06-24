@@ -180,13 +180,11 @@ fn compress(input_path: &str, output_path: &str) {
 
     for (c, f) in &freq_table {
         let c_u32 = *c as u32;
-        writer.write_all(&c_u32.to_be_bytes()).unwrap(); // Grava o code point como u32
+        writer.write_all(&c_u32.to_be_bytes()).unwrap(); // grava como u32 pra suportar unicode
 
         writer.write_all(&f.to_be_bytes()).unwrap(); // escreve a frequência
     }
     
-    
-
     writer.write_all(&encoded_bytes).unwrap();
 }
 
