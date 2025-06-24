@@ -166,7 +166,7 @@ fn compress(input_path: &str, output_path: &str) {
     let encoded = encode(&input, &codes);
     
     let padding = (8 - (encoded.len() % 8)) % 8;                         // calcular quantos bits faltam pra completar o byte.
-    let encoded_padded = format!("{}{}", encoded, "0".repeat(padding)); // adiciona zeros que faltam no final (little endian)
+    let encoded_padded = format!("{}{}", encoded, "0".repeat(padding)); // adiciona zeros que faltam no final (big endian)
 
     let encoded_bytes = bits_to_bytes(&encoded_padded);
 
