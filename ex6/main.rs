@@ -19,8 +19,7 @@ fn is_prime(x : u128) -> bool
 
 fn list_primes(start: u128, end : u128) -> Vec<u128>
 {
-    let range : Range<u128> = start .. end + 1;
-    return range.filter(|x : &u128| is_prime(*x)).collect();
+    (start..=end).(|x : &u128| is_prime(*x)).collect();
 }
 
 fn main() {

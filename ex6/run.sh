@@ -11,4 +11,4 @@ for size in "${sizes[@]}"; do
   done
 done
 
-./graphs.py
+python3 graphs.py
