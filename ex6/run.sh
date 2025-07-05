@@ -10,3 +10,5 @@ for size in "${sizes[@]}"; do
     echo "$size | $threads | $TIME" >> times.txt
   done
 done
+
+./graphs.py
