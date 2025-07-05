@@ -9,15 +9,25 @@ enum Huffman {
     Node { freq: u32, left: Box<Huffman>, right: Box<Huffman> },
 }
 
-impl PartialEq for Huffman {
-    fn eq(&self, other: &Self) -> bool {
-        (self.get_freq(), self.get_char()) == (other.get_freq(), other.get_char())
+impl Huffman {
+    fn get_freq(&self) -> u32 {
+        match self {
+            Huffman::Leaf { freq, .. } => *freq,
+            Huffman::Node { freq, .. } => *freq,
+        }
+    }
+
+    fn get_char(&self) -> char {
+        match self {
+            Huffman::Leaf { c, .. } => *c,
+            Huffman::Node { left, .. } => left.get_char(), // escolhe o primeiro caractere da subarvore
+        }
     }
 }
 
-impl PartialOrd for Huffman {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+impl PartialEq for Huffman {
+    fn eq(&self, other: &Self) -> bool {
+        (self.get_freq(), self.get_char()) == (other.get_freq(), other.get_char())
     }
 }
 
@@ -30,23 +40,12 @@ impl Ord for Huffman {
     }
 }
 
-impl Huffman {
-    fn get_freq(&self) -> u32 {
-        match self {
-            Huffman::Leaf { freq, .. } => *freq,
-            Huffman::Node { freq, .. } => *freq,
-        }
-    }
 
-    fn get_char(&self) -> char {
-        match self {
-            Huffman::Leaf { c, .. } => *c,
-            Huffman::Node { left, .. } => left.get_char(), // desempate usando o primeiro caractere da subárvore
-        }
+impl PartialOrd for Huffman {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
-
-
 
 fn build_frequency_table(text: &str) -> HashMap<char, u32> {
     let mut freq = HashMap::new();
@@ -61,7 +60,7 @@ fn build_huffman_tree(freq: &HashMap<char, u32>) -> Huffman {
     let mut heap: BinaryHeap<Huffman> = freq.iter()
         .map(|(&c, &f)| Huffman::Leaf { c, freq: f })
         .collect();
-
+    // enquanto tem mais de um nó, combina dois nós menores.
     while heap.len() > 1 {
         let min1 = heap.pop().unwrap();
         let min2 = heap.pop().unwrap();
@@ -146,6 +145,7 @@ fn bits_to_bytes(bits: &str) -> Vec<u8> {
         .collect()
 }
 
+// converte bytes pra uma string de bits
 fn bytes_to_bits(bytes: &[u8]) -> String {
     bytes.iter()
         .map(|byte| format!("{:08b}", byte))
@@ -164,8 +164,10 @@ fn compress(input_path: &str, output_path: &str) {
     build_codes(&huffman_tree, String::new(), &mut codes);
 
     let encoded = encode(&input, &codes);
-    let padding = (8 - (encoded.len() % 8)) % 8;
-    let encoded_padded = format!("{}{}", encoded, "0".repeat(padding));
+    
+    let padding = (8 - (encoded.len() % 8)) % 8;                         // calcular quantos bits faltam pra completar o byte.
+    let encoded_padded = format!("{}{}", encoded, "0".repeat(padding)); // adiciona zeros que faltam no final (big endian)
+
     let encoded_bytes = bits_to_bytes(&encoded_padded);
 
     let mut writer = BufWriter::new(File::create(output_path).unwrap());
@@ -177,10 +179,12 @@ fn compress(input_path: &str, output_path: &str) {
     writer.write_all(&t.to_be_bytes()).unwrap();
 
     for (c, f) in &freq_table {
-        writer.write_all(&(*c as u8).to_be_bytes()).unwrap();
-        writer.write_all(&f.to_be_bytes()).unwrap();
-    }
+        let c_u32 = *c as u32;
+        writer.write_all(&c_u32.to_be_bytes()).unwrap(); // grava como u32 pra suportar unicode
 
+        writer.write_all(&f.to_be_bytes()).unwrap(); // escreve a frequência
+    }
+    
     writer.write_all(&encoded_bytes).unwrap();
 }
 
@@ -188,22 +192,26 @@ fn decompress(input_path: &str, output_path: &str) {
     let mut reader = BufReader::new(File::open(input_path).unwrap());
     let mut buffer = [0u8; 2];
     reader.read_exact(&mut buffer).unwrap();
-    let n = u16::from_be_bytes(buffer);
+    let n = u16::from_be_bytes(buffer); // número de caracteres distintos
 
     let mut buffer = [0u8; 4];
     reader.read_exact(&mut buffer).unwrap();
-    let t = u32::from_be_bytes(buffer);
+    let t = u32::from_be_bytes(buffer); // total de caracteres
 
     let mut freq_table = HashMap::new();
     for _ in 0..n {
-        let mut c_buf = [0u8; 1];
-        let mut f_buf = [0u8; 4];
+        let mut c_buf = [0u8; 4];
         reader.read_exact(&mut c_buf).unwrap();
-        reader.read_exact(&mut f_buf).unwrap();
-        let c = c_buf[0] as char;
-        let f = u32::from_be_bytes(f_buf);
+        let c = char::from_u32(u32::from_be_bytes(c_buf)).unwrap();
+
+    
+        let mut f = [0u8; 4];
+        reader.read_exact(&mut f).unwrap();
+        let f = u32::from_be_bytes(f);
+    
         freq_table.insert(c, f);
     }
+    
 
     let mut encoded_bytes = Vec::new();
     reader.read_to_end(&mut encoded_bytes).unwrap();
