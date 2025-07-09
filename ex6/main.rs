@@ -1,4 +1,3 @@
-use std::ops::Range;
 use std::thread;
 use std::env;
 
@@ -19,7 +18,7 @@ fn is_prime(x : u128) -> bool
 
 fn list_primes(start: u128, end : u128) -> Vec<u128>
 {
-    (start..=end).(|x : &u128| is_prime(*x)).collect();
+    (start..=end).filter(|x : &u128| is_prime(*x)).collect()
 }
 
 fn main() {
